@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Weather Simulation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #1c1c1e;
+            --element-bg: #2c2c2e;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent-yellow: #fbd760;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden; /* Prevent scrolling during transitions */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- 1. LANDING PAGE (Initial State) --- */
+        .landing-page {
+            position: absolute;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .landing-page.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.1);
+        }
+
+        .landing-title {
+            font-size: 40px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, #fff, #8e8e93);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .landing-search {
+            background: var(--element-bg);
+            padding: 15px 25px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+
+        .landing-search input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 18px;
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .landing-search button {
+            background: var(--accent-yellow);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+        
+        .landing-search button:hover { transform: scale(1.1); }
+
+        /* --- 2. MAIN DASHBOARD (Hidden Initially) --- */
+        .dashboard {
+            background-color: var(--card-bg);
+            width: 90%;
+            max-width: 1000px;
+            height: 90vh; /* Fixed height for pro look */
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+            overflow-y: auto; /* Allow internal scroll if needed */
+        }
+
+        .dashboard.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Reusing previous Header Styles */
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+        .location-info h1 { font-size: 32px; font-weight: 600; }
+        .location-info p { color: var(--text-secondary); font-size: 16px; margin-top: 5px; }
+
+        .mini-search {
+            background: var(--element-bg);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .mini-search input { background: transparent; border: none; color: white; outline: none; font-size: 14px; }
+        .mini-search button { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; }
+
+        /* Grid Layout */
+        .main-content { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; margin-bottom: 40px; }
+        
+        /* Left Stats */
+        .current-weather { display: flex; flex-direction: column; gap: 20px; }
+        .temp-overview { display: flex; align-items: center; gap: 20px; }
+        .weather-icon-large { width: 80px; height: 80px; }
+        .temp-display { font-size: 64px; font-weight: 500; position: relative; }
+        .high-low { color: var(--text-secondary); font-size: 14px; }
+        
+        .stats-grid { margin-top: 10px; border-top: 1px solid #333; padding-top: 20px; display: grid; gap: 12px; }
+        .stat-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-secondary); }
+        .stat-row span:last-child { color: var(--text-primary); font-weight: 500; }
+
+        /* Right Chart */
+        .chart-card { background-color: var(--element-bg); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; }
+        .chart-container { flex-grow: 1; position: relative; height: 200px; width: 100%; }
+
+        /* Bottom Forecast */
+        .forecast-row { display: flex; justify-content: space-between; gap: 10px; overflow-x: auto; }
+        .forecast-card { padding: 15px 10px; border-radius: 15px; text-align: center; min-width: 80px; cursor: pointer; }
+        .forecast-card:hover, .forecast-card.active { background-color: var(--element-bg); }
+        .forecast-day { font-size: 14px; color: var(--text-secondary); margin-bottom: 5px; }
+        .forecast-icon { width: 30px; margin-bottom: 5px;}
+        .forecast-temps { font-size: 14px; font-weight: 500; }
+        .forecast-temps span { color: var(--text-secondary); font-size: 12px; margin-left: 5px; }
+
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+            .dashboard { padding: 20px; height: 100vh; border-radius: 0; }
+            .landing-search { width: 85%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="landing-page" id="landing-page">
+        <h1 class="landing-title">Weather Intelligence</h1>
+        <div class="landing-search">
+            <input type="text" id="landing-input" placeholder="Enter city name..." autocomplete="off">
+            <button id="landing-btn">→</button>
+        </div>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+        <div class="header">
+            <div class="location-info">
+                <h1 id="city-name">City Name</h1>
+                <p><span id="condition-text">Clear Sky</span> • <span id="current-date">Today</span></p>
+            </div>
+            <div class="mini-search">
+                <input type="text" id="dash-input" placeholder="Search city...">
+                <button id="dash-btn">🔍</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="current-weather">
+                <div class="temp-overview">
+                    <img id="main-icon" src="https://cdn-icons-png.flaticon.com/512/869/869869.png" class="weather-icon-large">
+                    <div>
+                        <div class="temp-display"><span id="temp-val">--</span>°</div>
+                        <div class="high-low">H:<span id="high-temp">--</span>° L:<span id="low-temp">--</span>°</div>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-row"><span>Humidity</span><span id="humidity">--%</span></div>
+                    <div class="stat-row"><span>Precipitation</span><span id="rain">0%</span></div>
+                    <div class="stat-row"><span>Wind</span><span id="wind">-- km/h</span></div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-container">
+                    <canvas id="weatherChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="forecast-row" id="forecast-container">
+            </div>
+    </div>
+
+    <script>
+        // --- DOM ELEMENTS ---
+        const landingPage = document.getElementById('landing-page');
+        const dashboard = document.getElementById('dashboard');
+        
+        const landingInput = document.getElementById('landing-input');
+        const landingBtn = document.getElementById('landing-btn');
+        
+        const dashInput = document.getElementById('dash-input');
+        const dashBtn = document.getElementById('dash-btn');
+
+        let chartInstance = null;
+
+        // --- EVENT LISTENERS ---
+        
+        // 1. Landing Page Search
+        landingBtn.addEventListener('click', () => initApp(landingInput.value));
+        landingInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') initApp(landingInput.value); });
+
+        // 2. Dashboard Search
+        dashBtn.addEventListener('click', () => updateDashboard(dashInput.value));
+        dashInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') updateDashboard(dashInput.value); });
+
+
+        // --- FUNCTIONS ---
+
+        function initApp(city) {
+            if(!city) return;
+            
+            // 1. Hide Landing, Show Dashboard
+            landingPage.classList.add('hidden');
+            dashboard.classList.add('active');
+            
+            // 2. Load Data
+            updateDashboard(city);
+        }
+
+        function updateDashboard(city) {
+            if(!city) return;
+
+            // --- SIMULATED DATA ENGINE ---
+            // Randomize temperature slightly to make it feel "real"
+            const baseTemp = Math.floor(Math.random() * (30 - 10 + 1) + 10); // Random between 10 and 30
+            const condition = ["Clear Sky", "Cloudy", "Rainy", "Partly Cloudy"][Math.floor(Math.random() * 4)];
+            
+            // Update Text
+            document.getElementById("city-name").innerText = capitalize(city);
+            document.getElementById("condition-text").innerText = condition;
+            document.getElementById("current-date").innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            
+            // Update Numbers
+            document.getElementById("temp-val").innerText = baseTemp;
+            document.getElementById("high-temp").innerText = baseTemp + 4;
+            document.getElementById("low-temp").innerText = baseTemp - 3;
+            document.getElementById("humidity").innerText = Math.floor(Math.random() * 60 + 20) + "%";
+            document.getElementById("wind").innerText = Math.floor(Math.random() * 20 + 5) + " km/h";
+
+            // Update Icon based on random condition
+            let iconUrl = "https://cdn-icons-png.flaticon.com/512/869/869869.png"; // Sun
+            if(condition === "Rainy") iconUrl = "https://cdn-icons-png.flaticon.com/512/1163/1163657.png";
+            if(condition === "Cloudy") iconUrl = "https://cdn-icons-png.flaticon.com/512/1163/1163624.png";
+            document.getElementById("main-icon").src = iconUrl;
+
+            // Generate Mock Graph Data
+            const graphData = generateGraphData(baseTemp);
+            renderChart(graphData);
+
+            // Generate Mock Forecast
+            generateForecast(baseTemp);
+        }
+
+        // Helper: Generate curve for the chart
+        function generateGraphData(base) {
+            let data = [];
+            let labels = [];
+            let currentHour = new Date().getHours();
+
+            for(let i=0; i<8; i++) {
+                // Simulate temperature rising/falling slightly
+                let variation = Math.floor(Math.random() * 5) - 2; 
+                data.push(base + variation);
+                labels.push(`${(currentHour + i) % 24}:00`);
+            }
+            return { labels, data };
+        }
+
+        // Helper: Generate bottom cards
+        function generateForecast(base) {
+            const container = document.getElementById("forecast-container");
+            container.innerHTML = "";
+            const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            const todayIdx = new Date().getDay() - 1; // 0-6
+
+            for(let i=0; i<7; i++) {
+                let dayName = i === 0 ? "Today" : days[(todayIdx + i) % 7];
+                let variation = Math.floor(Math.random() * 6) - 3;
+                let active = i === 0 ? "active" : "";
+                
+                let html = `
+                    <div class="forecast-card ${active}">
+                        <div class="forecast-day">${dayName}</div>
+                        <img src="https://cdn-icons-png.flaticon.com/512/869/869869.png" class="forecast-icon">
+                        <div class="forecast-temps">${base + variation}° <span>${base + variation - 5}°</span></div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            }
+        }
+
+        function renderChart(graphData) {
+            const ctx = document.getElementById('weatherChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(251, 215, 96, 0.5)'); 
+            gradient.addColorStop(1, 'rgba(251, 215, 96, 0.0)');
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: graphData.labels,
+                    datasets: [{
+                        data: graphData.data,
+                        borderColor: '#fbd760',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#8e8e93' } },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+    </script>
+</body>
+</html>
