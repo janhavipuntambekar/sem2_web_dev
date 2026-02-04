@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Event Flow Playground</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h1>Event Flow Playground</h1>
+  <p class="subtitle">Demonstrating Capturing, Bubbling & Propagation Control</p>
+
+  <div class="container">
+    <div class="playground">
+      <div class="grandparent">
+        <span class="label">Grandparent</span>
+
+        <div class="parent">
+          <span class="label">Parent</span>
+          <button id="child">Click Me</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="event-log">
+      <h3>Event Log</h3>
+      <div id="text"></div>
+      <footer class="note">
+        Capturing → Target → Bubbling<br />
+        stopPropagation blocks parents<br />
+        stopImmediatePropagation blocks siblings
+      </footer>
+    </div>
+
+  </div>
+
+</body>
+</html>
+    
+    <script src="./script.js"></script>
+</body>
+</html>
