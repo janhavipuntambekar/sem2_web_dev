@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body{
+        background-color:lavender;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    #box{
+        background-color: white;
+        border: 2px solid black;
+        width: 300px;
+        height: 500px;
+        /* display: flex;
+        justify-content: center;
+        align-items: center; */
+        position: relative;
+    }
+
+    #score{
+        top: 5px;
+        left: 10px;
+        margin: 10px;
+        position: relative;
+    }
+
+    #rbox{
+        background-color: red;
+        height: 40px;
+        width: 40px;
+        margin: 10px;
+        position: absolute;
+    }
+</style>
+<body>
+    <div id="box">
+        <div id="score">Score: 0</div>
+        <div id="rbox"></div>
+    </div>
+</body>
+<script src="./script.js">
+</script>
+</html>
