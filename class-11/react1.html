@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>Monkey Whack Game</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(to bottom, #87ceeb 60%, #5c4033 40%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .game {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            background: #6ab04c;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 6px solid #3d2b1f;
+        }
+
+        .score {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .monkey {
+            position: absolute;
+            font-size: 60px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .monkey:active {
+            transform: scale(0.9);
+        }
+
+        .hammer {
+            position: absolute;
+            font-size: 50px;
+            pointer-events: none;
+            animation: hit 0.3s ease;
+        }
+
+        @keyframes hit {
+            0% { transform: rotate(-40deg); opacity: 1; }
+            50% { transform: rotate(20deg); }
+            100% { transform: rotate(-10deg); opacity: 0; }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+
+        function MonkeyWhackGame() {
+            const [score, setScore] = React.useState(0);
+            const [position, setPosition] = React.useState({ x: 200, y: 200 });
+            const [showHammer, setShowHammer] = React.useState(false);
+
+            const moveMonkey = () => {
+                setPosition({
+                    x: Math.random() * 430,
+                    y: Math.random() * 430
+                });
+            };
+
+            const handleClick = () => {
+                setScore(prev => prev + 1);
+                setShowHammer(true);
+
+                setTimeout(() => {
+                    setShowHammer(false);
+                    moveMonkey();
+                }, 200);
+            };
+
+            return (
+                <div className="game">
+                    <div className="score">
+                        Score: {score}
+                    </div>
+
+                    <div
+                        className="monkey"
+                        onClick={handleClick}
+                        style={{ left: position.x, top: position.y }}
+                    >
+                        🐵
+                    </div>
+
+                    {showHammer && (
+                        <div
+                            className="hammer"
+                            style={{ left: position.x + 10, top: position.y - 30 }}
+                        >
+                            🔨
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<MonkeyWhackGame />);
+
+    </script>
+</body>
+</html>

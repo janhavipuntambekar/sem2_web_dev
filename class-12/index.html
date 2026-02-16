@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #main{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            background-color: lightgray;
+            width: 400px;
+            height : 500px;
+            border: 1px solid black;
+            border-radius: 10px;
+        }
+        #btn{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 500px;
+        }
+        #count{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 200px;
+            height: 100px;
+           
+        }
+        button{
+            margin: 10px;
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+        }
+        #reset{
+            width: 80px;
+        }
+        #value{
+            color: blue;
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div id ="main">
+        <h1>Counter App</h1>
+        <div id = "count">  
+            <span id = "value">0</h1></span>
+            
+        </div>
+        <div id="btn">
+        <button id = "decrease" style="background-color: red;">-</button>
+        <button id = "reset" style="background-color: yellow;">reset</button>
+        <button id = "increase" style="background-color: green;">+</button>
+        </div>
+    </div>
+    
+</body>
+<script src="./script.js"></script>
+</html>
