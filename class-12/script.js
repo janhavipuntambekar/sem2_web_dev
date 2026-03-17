@@ -1,21 +1,10 @@
-const decrease = document.getElementById("decrease");
-const reset = document.getElementById("reset");
-const increase = document.getElementById("increase");
-const value = document.getElementById("value");
+const random = document.getElementById("rbox");
+const score = document.getElementById("score");
 
-let count = 0;
+random.addEventListener("click", function () {
+  random.style.top = Math.random() * 450 + "px";
+  random.style.left = Math.random() * 250 + "px";
 
-decrease.addEventListener("click", () => {
-  count--;
-  value.textContent = count;
-});
-
-reset.addEventListener("click", () => {
-  count = 0;
-  value.textContent = count;
-});
-
-increase.addEventListener("click", () => {
-  count++;
-  value.textContent = count;
+  let currscore = +score.textContent.split(": ")[1];
+  score.textContent = "Score: " + (currscore + 1);
 });

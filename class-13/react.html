@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>Document</title>
+  </head>
+
+  <style>
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .counter {
+      background: white;
+      padding: 40px 60px;
+      border-radius: 20px;
+      text-align: center;
+    }
+
+    .counter h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    #value {
+      font-size: 60px;
+      margin: 20px;
+      color: #764ba2;
+    }
+
+    #btns {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+    }
+
+    #add {
+      background-color: green;
+      color: black;
+    }
+
+    #sub {
+      background-color: red;
+      color: black;
+    }
+
+    #reset {
+      background-color: yellow;
+      color: black;
+    }
+  </style>
+
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const rootEle = document.querySelector("#root");
+
+      function Counter() {
+        const [count, setCount] = React.useState(0);
+
+        // let count=0;
+
+        const handleDecrement = () => {
+          setCount(count - 1);
+        };
+
+        const handleReset = () => {
+          setCount(0);
+        };
+
+        const handleIncrement = () => {
+          setCount(count + 1);
+        };
+
+        return (
+          <div className="counter">
+            <h1>Counter App</h1>
+            <h2 id="value">{count}</h2>
+            <div id="btns">
+              <button id="sub" onClick={handleDecrement}>
+                -
+              </button>
+              <button id="reset" onClick={handleReset}>
+                reset
+              </button>
+              <button id="add" onClick={handleIncrement}>
+                +
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.render(<Counter />, rootEle);
+    </script>
+  </body>
+</html>
